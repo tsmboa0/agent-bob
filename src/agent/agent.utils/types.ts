@@ -2,10 +2,25 @@ import { PublicKey } from "@solana/web3.js"
 import { string, z } from "zod"
 
 export interface AgentResponse {
-    query: string | PublicKey
-    flag: "DUSTING" | "POISONING" | "SAFE",
-    spam_transactions: string[]
-    confidence_score: string
+    attack_detected: boolean;
+    is_dusting_attack: boolean;
+    is_poisoning_attack: boolean;
+    is_scam: boolean;
+    confidence: number;
+    dusting_details: {
+        dust_threshold:string;
+        total_dust_transaction:number;
+        unique_recipients: number;
+        avg_tps: number;
+        notes: string
+    };
+    poisoning_details: {
+        sender_address: string,
+        similarity_score: number,
+        matched_with_history: boolean,
+        notes: string
+    };
+    scam_transactions: string[]
 }
 
 export interface AgentRequest {
@@ -41,10 +56,9 @@ export const AgentResponseSchema = z.object({
         notes: z.string().describe("any notable behavior or anomalies")
     }),
     poisoning_details: z.object({
-        dust_threshold: z.string(),
-        total_dust_transactions: z.number(),
-        unique_recipients: z.number(),
-        avg_tps: z.number(),
+        sender_address: z.string(),
+        similarity_score: z.number(),
+        matched_with_history: z.boolean(),
         notes: z.string().describe("any notable behavior or anomalies")
     }),
     scam_transactions: z.array(
