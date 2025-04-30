@@ -1,5 +1,11 @@
 # SolanaGuard: Advanced Solana Security API
 
+![SolanaGuard](https://img.shields.io/badge/SolanaGuard-Security%20API-8A2BE2)
+![Nest.js](https://img.shields.io/badge/Nest.js-Framework-E0234E)
+![LangGraph.js](https://img.shields.io/badge/LangGraph.js-Agent%20Framework-6495ED)
+![Helius](https://img.shields.io/badge/Helius-RPC%20Integration-2FD8B9)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 ## Overview
 
 SolanaGuard is a cutting-edge security API built on Nest.js that leverages the power of multi-agent AI systems through LangGraph.js to detect and prevent common attack vectors in the Solana ecosystem. This specialized security layer focuses on two of the most prevalent threats to Solana users:
@@ -8,6 +14,38 @@ SolanaGuard is a cutting-edge security API built on Nest.js that leverages the p
 - **Account Dusting Attacks**: Where small amounts of tokens are sent to wallets to track user activity or prepare for more sophisticated phishing attempts
 
 By utilizing Helius RPC services and a sophisticated multi-agent architecture, SolanaGuard provides real-time analysis and threat detection capabilities that can be integrated into any Solana application.
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                                                               │
+│                     SolanaGuard API                           │
+│    ┌─────────────────────────────────────────────────┐        │
+│    │              Nest.js Framework                  │        │
+│    │                                                 │        │
+│    │  ┌─────────────┐  ┌────────────┐  ┌──────────┐ │        │
+│    │  │ Controllers │  │ Services   │  │ DTOs     │ │        │
+│    │  └─────────────┘  └────────────┘  └──────────┘ │        │
+│    └─────────────────────────────────────────────────┘        │
+│                                                               │
+│    ┌─────────────────────────────────────────────────┐        │
+│    │            LangGraph.js Agents                  │        │
+│    │                                                 │        │
+│    │  ┌─────────────┐  ┌────────────┐  ┌──────────┐ │        │
+│    │  │ Supervisor  │  │ Poisoning  │  │ Dusting  │ │        │
+│    │  │ Agent       │  │ Detector   │  │ Detector │ │        │
+│    │  └─────────────┘  └────────────┘  └──────────┘ │        │
+│    └─────────────────────────────────────────────────┘        │
+│                                                               │
+│    ┌─────────────────────────────────────────────────┐        │
+│    │             Helius Integration                  │        │
+│    │                                                 │        │
+│    │  ┌─────────────┐  ┌────────────┐  ┌──────────┐ │        │
+│    │  │ RPC Client  │  │ Parsers    │  │ WebHooks │ │        │
+│    │  └─────────────┘  └────────────┘  └──────────┘ │        │
+│    └─────────────────────────────────────────────────┘        │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
+```
 
 ## Key Features
 
@@ -21,6 +59,45 @@ By utilizing Helius RPC services and a sophisticated multi-agent architecture, S
 ## Architecture
 
 SolanaGuard implements a sophisticated multi-agent system using LangGraph.js:
+
+### Agent Structure and Workflow
+
+```
+┌────────────────────┐
+│                    │
+│  Helius RPC API    │
+│                    │
+└─────────┬──────────┘
+          │
+          ▼
+┌─────────────────────┐
+│                     │
+│  Transaction Data   │
+│                     │
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│              Supervisor Agent                   │
+│                                                 │
+│  ┌─────────────────────┐  ┌─────────────────┐   │
+│  │                     │  │                 │   │
+│  │  Task Allocation    │  │  Result         │   │
+│  │                     │  │  Aggregation    │   │
+│  └─────────┬───────────┘  └────────┬────────┘   │
+│            │                       │            │
+└────────────┼───────────────────────┼────────────┘
+             │                       ▲
+             │                       │
+             ▼                       │
+┌────────────┴───────────┐     ┌─────┴──────────────┐
+│                        │     │                    │
+│  Address Poisoning     │     │  Account Dusting   │
+│  Detector Agent        │     │  Detection Agent   │
+│                        │     │                    │
+└────────────────────────┘     └────────────────────┘
+```
 
 1. **Supervisor Agent**: Orchestrates the analysis workflow, evaluates reports from specialized agents, resolves conflicts, and produces final verdicts with confidence ratings and actionable recommendations
 
@@ -36,7 +113,7 @@ SolanaGuard implements a sophisticated multi-agent system using LangGraph.js:
    - Examining token types and their common use in dusting campaigns
    - Correlating with known malicious addresses and dusting patterns
 
-The agents communicate through a structured workflow managed by LangGraph.js, providing multiple perspectives on each analyzed transaction.
+The agents communicate through a structured workflow managed by LangGraph.js, providing multiple perspectives on each analyzed transaction. This multi-agent approach allows for specialized analysis while maintaining a unified response system.
 
 ## Installation
 
@@ -87,53 +164,100 @@ RATE_LIMIT_WINDOW=15m
 ### Check Transaction Safety
 
 ```bash
-curl -X POST http://localhost:3000/api/analyze/transaction \
-  -H "Content-Type: application/json" \
-  -d '{
-    "signature": "transaction_signature_here"
-  }'
-```
-
-### Monitor Wallet for Threats
-
-```bash
 curl -X POST http://localhost:3000/agent/analyze \
   -H "Content-Type: application/json" \
   -d '{
-    "data": "user_wallet_address_here or a valid_signature",
+    "data": "transaction_signature_here"
   }'
 ```
+The data can be a valid transaction signature or a solana wallet address.
+If transactionId, it extracts the sender and recepient, perform the analyis and returns a result.
 
-## Response Example
+If a wallet address is provided, it analyzes it and provides a result.
+
+The result conatins a comprehensive analysis and returns a list of scam signatures to be filtered away from the user history to prevent them from falling victims to the malicious activities.
+
+## Response Format
+
+The API returns a standardized response object with comprehensive threat detection results:
 
 ```json
 {
-    is_dusting_attack: boolean;
-    is_poisoning_attack: boolean;
-    is_scam: boolean;
-    confidence: number;
-    dusting_details: {
-        dust_threshold:string;
-        total_dust_transaction:number;
-        unique_recipients: number;
-        avg_tps: number;
-        notes: string
-    };
-    poisoning_details: {
-        sender_address: string,
-        similarity_score: number,
-        matched_with_history: boolean,
-        notes: string
-    };
-    scam_transactions: string[]
+  "is_dusting_attack": boolean,
+  "is_poisoning_attack": boolean,
+  "is_scam": boolean,
+  "confidence": number,
+  "dusting_details": {
+    "dust_threshold": string,
+    "total_dust_transaction": number,
+    "unique_recipients": number,
+    "avg_tps": number,
+    "notes": string
+  },
+  "poisoning_details": {
+    "sender_address": string,
+    "similarity_score": number,
+    "matched_with_history": boolean,
+    "notes": string
+  },
+  "scam_transactions": string[]
+}
+```
+
+### Example Response
+
+```json
+{
+  "is_dusting_attack": true,
+  "is_poisoning_attack": false,
+  "is_scam": true,
+  "confidence": 0.87,
+  "dusting_details": {
+    "dust_threshold": "0.000005 SOL",
+    "total_dust_transaction": 124,
+    "unique_recipients": 47,
+    "avg_tps": 3.2,
+    "notes": "Pattern matches known dusting campaign from April 2025. Multiple small transactions sent to high-value wallets within 15 minute window."
+  },
+  "poisoning_details": {
+    "sender_address": "",
+    "similarity_score": 0,
+    "matched_with_history": false,
+    "notes": "No address poisoning detected in this transaction."
+  },
+  "scam_transactions": [
+    "5KKsW8snvQRKGYGRDCqpFqUKMjYKMx3pNUztYJPvdVUdEWUxj9cg8fH94ELmqKEpnN9yzQQcHgyBimWQcKbTKwPj",
+    "3nRpzFDgYDzToXwY5QiEkKQjkwxSiJfYSKHWiYvUGHBmv4kPC8Un6VKXhZ71WnHFkUJp9X3JPZYmkM6VPtHLHDYi"
+  ]
 }
 ```
 
 ## Technical Details
 
-### Agent Workflows
+### Agent Workflows and Decision Process
 
-The SolanaGuard API implements a sophisticated LangGraph.js workflow that enables agents to:
+The SolanaGuard API implements a sophisticated LangGraph.js workflow that enables agents to process transactions through a series of steps:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                     Transaction Analysis Pipeline                   │
+│                                                                     │
+├─────────────┬─────────────┬─────────────┬────────────┬─────────────┤
+│ Raw         │ Feature     │ Agent       │ Cross-     │ Verdict     │
+│ Transaction │ Extraction  │ Analysis    │ Validation │ Generation  │
+│ Data        │             │             │            │             │
+├─────────────┼─────────────┼─────────────┼────────────┼─────────────┤
+│ • Tx Hash   │ • Amounts   │ • Pattern   │ • Evidence │ • Threat    │
+│ • Addresses │ • Tokens    │   Matching  │   Sharing  │   Type      │
+│ • Amounts   │ • Timeframes│ • Similarity│ • Conflict │ • Confidence│
+│ • Metadata  │ • History   │   Scoring   │   Resolution│  Score     │
+│ • Signatures│ • Patterns  │ • Risk      │ • Consensus│ • Details   │
+│             │             │   Evaluation│   Building │             │
+└─────────────┴─────────────┴─────────────┴────────────┴─────────────┘
+```
+
+The workflow enables agents to:
 
 1. **Process raw transaction data** from Helius RPC
 2. **Extract relevant features** for security analysis
@@ -141,6 +265,8 @@ The SolanaGuard API implements a sophisticated LangGraph.js workflow that enable
 4. **Exchange findings** between agents when relevant
 5. **Generate consensus verdicts** through the supervisor
 6. **Provide actionable intelligence** for users or systems
+
+This multi-stage pipeline ensures comprehensive analysis of each transaction while maintaining processing efficiency.
 
 ### Detection Methodologies
 
