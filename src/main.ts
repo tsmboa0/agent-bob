@@ -10,7 +10,7 @@ async function bootstrap() {
 
   // Swagger setup
   const config = new DocumentBuilder()
-    .setTitle('Helius Agent API')
+    .setTitle('baxus Agent API')
     .setDescription('API for blockchain analysis and agent interactions')
     .setVersion('1.0')
     .build();

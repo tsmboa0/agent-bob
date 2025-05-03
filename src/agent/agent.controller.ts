@@ -1,16 +1,24 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Logger } from '@nestjs/common';
 import { AgentService } from './agent.service';
+import { BaxusService } from 'src/baxus/baxus.service';
 
 @Controller('agent')
 export class AgentController {
-  constructor(private readonly agentService: AgentService) {}
+  constructor(
+    private readonly agentService: AgentService,
+    private readonly baxusService: BaxusService
+  ) {}
 
-  @Post('analyze')
-  async analyze(@Body('input') input: string) {
-    if(!this.agentService.isValidateData(input)){
-        throw new BadRequestException("The input data mus be a valid solana address or signature")
+  @Post('recommend')
+  async analyze(@Body('username') username: string) {
+
+    const userBarDetails = await this.baxusService.fetchUserData(username)
+
+    if(!userBarDetails){
+        throw new BadRequestException("An error occured. Ensure you have provided a valid username")
     }
+    console.log("calling the agent now")
 
-    return await this.agentService.callAgent(input)
+    return await this.agentService.callAgent(userBarDetails)
   }
 }
