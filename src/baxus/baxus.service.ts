@@ -42,8 +42,10 @@ export class BaxusService {
     try {
       // Use baxus endpoint to fetch data
       const response = await axios.get(`${BAXUS_END_POINT}/${username}`)
-      console.log(`the user's data is: ${response.data[0]}`)
-      return response.data
+
+      const parsedResponse = response.data.map((data:any)=> data.product)
+
+      return parsedResponse
     }catch{
       console.log("failed to fetch user")
       return null

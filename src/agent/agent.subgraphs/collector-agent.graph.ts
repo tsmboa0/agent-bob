@@ -9,7 +9,7 @@ import { Collector } from "../agent.utils/types";
 
 const CallModel = async(state: typeof GeneralState.State)=>{
     console.log("entered collector subgraph")
-    const {messages, metadata} = state;
+    const {messages} = state;
     const prompt = ChatPromptTemplate.fromMessages([
         ["system", CollectorPrompt]
     ])
@@ -18,7 +18,7 @@ const CallModel = async(state: typeof GeneralState.State)=>{
 
     console.log(`the collector response is ${response.content}`)
 
-    return{collector: response.content}
+    return{collector: JSON.parse(JSON.stringify(response.content))}
 }
 
 const builder = new StateGraph(GeneralState)

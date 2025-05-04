@@ -9,7 +9,7 @@ import { Socializer } from "../agent.utils/types";
 
 const CallModel = async(state: typeof GeneralState.State)=>{
     console.log("entered socializer subgraph")
-    const {messages, metadata} = state;
+    const {messages} = state;
     const prompt = ChatPromptTemplate.fromMessages([
         ["system", SocializerPrompt]
     ])
@@ -18,7 +18,7 @@ const CallModel = async(state: typeof GeneralState.State)=>{
 
     console.log(`the socializer response is ${response.content}`)
 
-    return{socializer: response.content}
+    return{socializer: JSON.parse(JSON.stringify(response.content))}
 }
 
 const builder = new StateGraph(GeneralState)

@@ -9,7 +9,7 @@ import { investor } from "../agent.utils/types";
 
 const CallModel = async(state: typeof GeneralState.State)=>{
     console.log("entered investor subgraph")
-    const {messages, metadata} = state;
+    const {messages} = state;
     const prompt = ChatPromptTemplate.fromMessages([
         ["system", InvestorPrompt]
     ])
@@ -18,7 +18,7 @@ const CallModel = async(state: typeof GeneralState.State)=>{
 
     console.log(`the investor response is ${response.content}`)
 
-    return{investor: response.content}
+    return{investor: JSON.parse(JSON.stringify(response.content))}
 }
 
 const builder = new StateGraph(GeneralState)

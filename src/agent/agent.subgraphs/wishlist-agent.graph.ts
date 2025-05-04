@@ -9,7 +9,7 @@ import { Wishlist } from "../agent.utils/types";
 
 const CallModel = async(state: typeof GeneralState.State)=>{
     console.log("entered wishlist subgraph")
-    const {messages, metadata} = state;
+    const {messages} = state;
     const prompt = ChatPromptTemplate.fromMessages([
         ["system", WishlistPrompt]
     ])
@@ -19,7 +19,7 @@ const CallModel = async(state: typeof GeneralState.State)=>{
 
     console.log(`the wishlist response is ${response.content}`)
 
-    return{wishlist: response.content}
+    return{wishlist: JSON.parse(JSON.stringify(response.content))}
 }
 
 const builder = new StateGraph(GeneralState)

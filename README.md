@@ -8,7 +8,7 @@ BAXUS-Bob is an intelligent whisky recommendation platform that analyzes users' 
 
 ## Architecture
 
-Bob employs a modular multi-agent system where specialized agents handle different aspects of whisky analysis and recommendation:
+Bob employs a modular multi-agent system (using Langgraph.js) where specialized agents handle different aspects of whisky analysis and recommendation:
 
 ```
                              ┌─────────────────────────┐
@@ -53,12 +53,6 @@ Bob employs a modular multi-agent system where specialized agents handle differe
 
 ```json
 {
-  "user": {
-    "username": "whiskylover123",
-    "total_bottles_analyzed": 34,
-    "wishlist_bottles": 5,
-    "analysis_date": "2025-05-02"
-  },
   "recommendations": {
     "top_recommendations": [
       {
@@ -130,13 +124,6 @@ Bob employs a modular multi-agent system where specialized agents handle differe
         "reason": "Diversifies flavor profile"
       }
     ]
-  },
-  "summary": {
-    "key_takeaways": [
-      "Add a Japanese single malt to your collection",
-      "Fill the American bourbon gap",
-      "Prioritize investment buys like Springbank 15"
-    ]
   }
 }
 ```
@@ -162,8 +149,8 @@ The system is built using NestJS, a progressive Node.js framework, with the foll
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/baxus-bob.git
-cd baxus-bob
+git clone https://github.com/yourusername/agent-bob.git
+cd agent-bob
 ```
 
 2. Install dependencies:
@@ -196,9 +183,7 @@ npm run start:prod
 
 Request example 
 ```bash
-{
-  username: carriebaxus
-}
+/agent/recommend/your-username
 ```
 
 ## Testing

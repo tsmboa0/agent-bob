@@ -2,22 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { graph } from './agent.index';
 import { PublicKey } from "@solana/web3.js";
 import { HumanMessage } from '@langchain/core/messages';
-import { cleanedData } from 'src/helpers/process-metadata';
+import { searchRelevantBottlesFromBar } from '../../helpers/searchBM25';
+import { formatAgentResponse } from 'helpers/format-agent-response';
 
 @Injectable()
 export class AgentService {
 
-    async callAgent(data:any) {
+    async callAgent(barDetails:any) {
+        const bm25_matches = await searchRelevantBottlesFromBar(barDetails)
         const state = {
-            messages: [new HumanMessage(data)],
-            metadata: cleanedData
+            messages: [new HumanMessage(JSON.stringify(barDetails, null, 2))],
+            metadata: bm25_matches
         }
-
-        console.log(`state defined with input: ${state.messages}`)
-        
+        // Invoke the agent graph
         const response = await graph.invoke(state)
 
-        return JSON.parse(response.combined)
+        const formatedResponse = formatAgentResponse(response)
+
+        return formatedResponse
     }
         
   

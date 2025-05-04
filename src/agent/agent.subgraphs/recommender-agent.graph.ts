@@ -9,16 +9,16 @@ import { Recommender } from "../agent.utils/types";
 
 const CallModel = async(state: typeof GeneralState.State)=>{
     console.log("entered recommender subgraph")
-    const {messages, metadata} = state;
+    const {messages} = state;
     const prompt = ChatPromptTemplate.fromMessages([
         ["system", RecommenderPrompt]
     ])
     const chain = prompt.pipe(LLM)
-    const response = await chain.invoke({recommender_response:Recommender, msgs:messages})
+    const response = await chain.invoke({recommender_response:Recommender, msgs:messages[0].content})
 
     console.log(`the recommender response is ${response.content}`)
 
-    return{recommender: response.content}
+    return{recommender: JSON.parse(JSON.stringify(response.content))}
 }
 
 const builder = new StateGraph(GeneralState)

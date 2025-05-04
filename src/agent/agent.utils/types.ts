@@ -27,16 +27,19 @@ export const  Recommender ={
   }
 
   export const Collector = {
-    "investment_insights": {
-      "hold": {
-        "name": string,
-        "current_value": "$300",
-        "estimated_appreciation": "12% over next 2 years"
-      },
-      "recommended_buy": {
-        "name": "Springbank 15",
-        "reason": "Limited allocations, rising demand on secondary market"
-      }
+    "collection_gaps": {
+      "underrepresented_regions": [
+        {
+          "region": "American Bourbons",
+          "suggested_bottle": "Blanton’s Single Barrel"
+        }
+      ],
+      "missing_age_segments": [
+        {
+          "age_group": "Over 20 years",
+          "suggested_bottle": "Glenfiddich 21 Gran Reserva"
+        }
+      ]
     }
   }
 

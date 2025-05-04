@@ -4,7 +4,6 @@ import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 
 export const GeneralState = Annotation.Root({
     ...MessagesAnnotation.spec,
-    metadata: Annotation<any>(),
     collector: Annotation<any>(),
     recommender: Annotation<any>(),
     investor: Annotation<any>(),

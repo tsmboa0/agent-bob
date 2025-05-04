@@ -11,7 +11,7 @@ async function bootstrap() {
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('baxus Agent API')
-    .setDescription('API for blockchain analysis and agent interactions')
+    .setDescription('API for whisky bottle recommendations')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
