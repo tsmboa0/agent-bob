@@ -132,7 +132,7 @@ Bob employs a modular multi-agent system (using Langgraph.js) where specialized 
 
 ### Agent Architecture Diagram
 
-![Agent Graph](assets/graph.png)
+![Agent Graph](assets/agent-graph.png)
 
 The multi-agent system is built using LangGraph.js (a leading framework for agentic applications) and NestJS (a progressive Node.js framework).
 
