@@ -4,8 +4,8 @@ import Papa from 'papaparse';
 
 import * as path from 'path';
 
-const rootPath = path.resolve(__dirname, '../../');
-const csvPath = path.join(rootPath, 'data/metadata.csv');
+const csvPath = path.resolve(process.cwd(), 'data/metadata.csv');
+
 
 const csvFile = fs.readFileSync(csvPath, 'utf8');
 

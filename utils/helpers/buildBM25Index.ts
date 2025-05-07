@@ -4,30 +4,10 @@ import path from 'path';
 import csv from 'csv-parser';
 import bm25 from 'wink-bm25-text-search';
 import tokenizer from 'wink-tokenizer';
+import { Bottle } from 'utils/types';
 
-const rootPath = path.resolve(__dirname, '../../');
-const csvPath = path.join(rootPath, 'data/metadata.csv');
+const csvPath = path.resolve(process.cwd(), 'data/metadata.csv');
 
-type Bottle = {
-  id: string,
-  name: string,
-  abv: string,
-  image_url: string,
-  region: string,
-  avg_msrp: number,
-  fair_price: number,
-  shelf_price: number,
-  proof: string,
-  brand_id: string,
-  popularity: number,
-  size: number,
-  spirit_type: string,
-  total_score: number,
-  wishlist_count: number,
-  vote_count: number,
-  bar_count: number,
-  ranking: number,
-}
 
 const metadataPath = csvPath;
 
@@ -37,7 +17,7 @@ export async function buildBM25Index(): Promise<{ search: any, get: (id: string)
   const tokenizerInstance = new tokenizer().tokenize;
   
   // Configure the engine
-  engine.defineConfig({ fldWeights: { description: 1 } });
+  engine.defineConfig({ fldWeights: { bottleName: 1 } });
   engine.definePrepTasks([
     (text: string) => tokenizerInstance(text).map((t: any) => t.value.toLowerCase()),
   ]);
@@ -67,8 +47,8 @@ export async function buildBM25Index(): Promise<{ search: any, get: (id: string)
   console.log('Building BM25 index...');
   for (const bottle of bottles) {
     try {
-      const description = `${bottle.name}, ${bottle.spirit_type}, ${bottle.proof} proof, MSRP $${bottle.avg_msrp}`;
-      engine.addDoc({ description }, bottle.id);
+      const bottleName = `${bottle.name}`;
+      engine.addDoc({ bottleName }, bottle.id);
     } catch (err) {
       console.error(`Error adding document for bottle ${bottle.id}:`, err);
       // Continue with other bottles instead of aborting everything

@@ -1,13 +1,15 @@
-import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
+import { BaseMessage } from "@langchain/core/messages";
+import { Annotation, MessagesAnnotation, messagesStateReducer } from "@langchain/langgraph";
 
-
+const messages_reducer = {
+    reducer: messagesStateReducer,
+    default: ()=>[]
+}
 
 export const GeneralState = Annotation.Root({
-    ...MessagesAnnotation.spec,
-    collector: Annotation<any>(),
-    recommender: Annotation<any>(),
-    investor: Annotation<any>(),
-    socializer: Annotation<any>(),
-    wishlist: Annotation<any>(),
-    combined: Annotation<any>()
+    recommenderMessages: Annotation<BaseMessage[]>(messages_reducer),
+    collectorMessages: Annotation<BaseMessage[]>(messages_reducer),
+    investorMessages: Annotation<BaseMessage[]>(messages_reducer),
+    socializerMessages: Annotation<BaseMessage[]>(messages_reducer),
+    wishlistMessages: Annotation<BaseMessage[]>(messages_reducer),
 })

@@ -1,29 +1,32 @@
 import { StateGraph, END, START, MemorySaver } from "@langchain/langgraph";
-import { LLM } from "../agent.utils/models";
 import { GeneralState } from "../agent.utils/state";
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { SocializerPrompt } from "../agent.utils/prompts";
 import { Socializer } from "../agent.utils/types";
+import { CallModelNode, shouldCallToolNode, callToolNode } from "../agent.utils/nodes";
 
 
 
 const CallModel = async(state: typeof GeneralState.State)=>{
-    console.log("entered socializer subgraph")
-    const {messages} = state;
-    const prompt = ChatPromptTemplate.fromMessages([
-        ["system", SocializerPrompt]
-    ])
-    const chain = prompt.pipe(LLM)
-    const response = await chain.invoke({socializer_response:Socializer, msgs:messages})
+    const response = await CallModelNode("socializer", state.socializerMessages, SocializerPrompt, Socializer)
 
-    console.log(`the socializer response is ${response.content}`)
+    return {socializerMessages: [response]}
+}
 
-    return{socializer: JSON.parse(JSON.stringify(response.content))}
+const shouldCallTool = async(state: typeof GeneralState.State)=>{
+    return shouldCallToolNode(state.socializerMessages)
+}
+
+const toolNode = async(state: typeof GeneralState.State)=>{
+    const toolResponse = await callToolNode(state.socializerMessages, "socializer")
+    return {socializerMessages: toolResponse}
 }
 
 const builder = new StateGraph(GeneralState)
 .addNode("call_model", CallModel)
+.addNode("tools", toolNode)
 .addEdge(START, "call_model")
+.addConditionalEdges("call_model", shouldCallTool)
+.addEdge("tools", "call_model")
 .addEdge("call_model", END)
 
 const checkpoint = new MemorySaver()

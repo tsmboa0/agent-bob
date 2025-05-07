@@ -5,6 +5,7 @@ import { RecommenderAgent } from "./agent.subgraphs/recommender-agent.graph";
 import { InvestorAgent } from "./agent.subgraphs/investor-agent.graph";
 import { SocializerAgent } from "./agent.subgraphs/socializer-agent.graph";
 import { WishlistAgent } from "./agent.subgraphs/wishlist-agent.graph";
+import * as tslab from "tslab"
 
 
 const builder = new StateGraph(GeneralState)
@@ -30,4 +31,3 @@ const checkpoint = new MemorySaver()
 export const graph = builder.compile({
     // checkpointer: checkpoint
 })
-

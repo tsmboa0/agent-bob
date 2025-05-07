@@ -130,18 +130,47 @@ Bob employs a modular multi-agent system (using Langgraph.js) where specialized 
 
 ## Technical Implementation
 
-The system is built using NestJS, a progressive Node.js framework, with the following components:
+### Agent Architecture Diagram
 
-- **Agent Controllers**: Handle API requests and coordinate multi-agent responses
-- **Recommendation Services**: Process collection data and generate recommendations
-- **BAXUS API Integration**: Connect to the BAXUS user bar endpoints
-- **LLM Integration**: Leverage language models for specialized analysis
+![Agent Graph](assets/graph.png)
+
+The multi-agent system is built using LangGraph.js (a leading framework for agentic applications) and NestJS (a progressive Node.js framework).
+
+The application have the following modules:
+
+- **Baxus Module**: Manages everything related to Baxus, including fetching the user’s bar history, searching for bottles that match a query from the dataset, and verifying if the recommended bottles are present in the dataset of 501 bottles.
+- **Agent Module**: Handle API requests and coordinate multi-agent responses
+
+### Below is a step by step process how these team of Agents work.
+
+- Step 1: Request Received:
+The application receives a request at the endpoint:
+/agent/recommend/{username}
+
+- Step 2: Fetch User Data:
+The Baxus service fetches the user’s bar details.
+
+- Step 3: Invoke Agent Graph:
+The user’s bar history is passed to the Agent service, and the LangGraph graph is invoked.
+
+How the multi Agent system work:
+
+- All agents operate in parallel, independently of each other.
+- Each agent analyzes the user’s bar history and performs its specialized task.
+- Agents generate bottle recommendations tailored to the user’s collection.
+- Agents use available tools to verify if their recommended bottles exist in the Baxus dataset of 501 bottles.
+- If the recommended bottle is not found in the dataset, the agent re-iterates to suggest an alternative.
+- All agent responses are then aggregated into the final API response.
+
+## Security Considerations.
+
+The data sent to the LLM does not include the user's personal informations such as their usernames to keep them anonymous.
 
 ## Installation & Setup
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js (v20 or higher)
 - npm or yarn
 - Access to the BAXUS API endpoint
 
@@ -160,9 +189,10 @@ npm install
 
 3. Configure environment variables:
 ```bash
-cp .env.example .env
+cp .env.example .env 
 ```
 Then edit `.env` with your API keys and configuration.
+Note: Use API Keys from OpenAI preferrably. An alternative is Groq (Free but highly rate-limited) 
 
 ### Running the Application
 
@@ -179,11 +209,11 @@ npm run start:prod
 
 ### API Endpoint
 
-- **GET /agent/recommend**: Get comprehensive whisky recommendations for a user
+- **GET /agent/recommend/{username}**: Get comprehensive whisky recommendations for a user
 
 Request example 
 ```bash
-/agent/recommend/your-username
+/agent/recommend/carriebaxus
 ```
 
 ## Testing
@@ -202,10 +232,12 @@ npm run test:cov
 ## Future Enhancements
 
 - Integration with auction data for more accurate investment recommendations
+- Caching popular bar hsitories to reduce frequent LLM API calls (increases speed and reduces cost)
 - User feedback loop to improve recommendation accuracy over time
 - Expanded food and occasion pairing database
 - Flavor profile visualization tools
 - Social sharing of recommendations
+- We used the multi-agent system architecture to allow for easy integrations of future agents.
 
 ## License
 

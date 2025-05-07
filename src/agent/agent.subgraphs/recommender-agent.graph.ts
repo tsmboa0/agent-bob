@@ -1,29 +1,32 @@
 import { StateGraph, END, START, MemorySaver } from "@langchain/langgraph";
-import { LLM } from "../agent.utils/models";
 import { GeneralState } from "../agent.utils/state";
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { RecommenderPrompt } from "../agent.utils/prompts";
 import { Recommender } from "../agent.utils/types";
+import { CallModelNode, shouldCallToolNode, callToolNode } from "../agent.utils/nodes";
 
 
 
 const CallModel = async(state: typeof GeneralState.State)=>{
-    console.log("entered recommender subgraph")
-    const {messages} = state;
-    const prompt = ChatPromptTemplate.fromMessages([
-        ["system", RecommenderPrompt]
-    ])
-    const chain = prompt.pipe(LLM)
-    const response = await chain.invoke({recommender_response:Recommender, msgs:messages[0].content})
+    const response = await CallModelNode("Recommender", state.recommenderMessages, RecommenderPrompt, Recommender)
 
-    console.log(`the recommender response is ${response.content}`)
+    return {recommenderMessages: [response]}
+}
 
-    return{recommender: JSON.parse(JSON.stringify(response.content))}
+const shouldCallTool = async(state: typeof GeneralState.State)=>{
+    return shouldCallToolNode(state.recommenderMessages)   
+}
+
+const toolNode = async(state: typeof GeneralState.State)=>{
+    const toolResponse = await callToolNode(state.recommenderMessages, "recommender");
+    return {recommenderMessages: toolResponse}
 }
 
 const builder = new StateGraph(GeneralState)
 .addNode("call_model", CallModel)
+.addNode("tools", toolNode)
 .addEdge(START, "call_model")
+.addConditionalEdges("call_model", shouldCallTool)
+.addEdge("tools", "call_model")
 .addEdge("call_model", END)
 
 const checkpoint = new MemorySaver()
